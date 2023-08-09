@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <main className="">
       <Game>
-        <Board player={false} />
+        <Board player={true} />
         {/* <Board /> */}
       </Game>
     </main>
