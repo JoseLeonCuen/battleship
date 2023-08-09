@@ -1,17 +1,15 @@
 "use client";
 
-import React, { useState, ReactNode } from "react";
+import React, { useState, useEffect, useCallback, ReactNode } from "react";
 import styled from "styled-components";
 import SeaTile from "./Tiles/SeaTile";
 import TextTile from "./Tiles/TextTile";
 
-export type Coordenates = {
-  [key: string]: boolean;
-}
+import { ShipType, Coordenates } from "../utils/types";
+import { setBoard, letters, numbers } from "../utils/setup";
+import { getShipName, attackShip, findShip, isShipSunk } from "../utils/utils";
 
 const Board: React.FC = () => {
-  const numbers = ["", "1", "2", "3", "4", "5" ,"6", "7", "8", "9", "10"];
-  const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
   const Board = styled.div`
     box-sizing: border-box;
     display: grid;
@@ -27,39 +25,56 @@ const Board: React.FC = () => {
     padding: 5px;
   `;
 
+  const [turn, setTurn] = useState(true);
   const [attacks, setAttacks] = useState({} as Coordenates);
-  const [ships, setShips] = useState({
-    B2: true,
-    B3: true,
-    B4: true
-  } as Coordenates);
+  const [ships, setShips] = useState([] as ShipType[]);
 
+  useEffect(() => {
+    setShips(setBoard());
+  }, []);
+
+  const columns = ["", ...numbers];
   const attack = (id: string) => {
     setAttacks({
       ...attacks,
       [id]: true
+    });
+
+    if (findShip(id, ships)) {
+      console.log("HIT!!");
+      const name = getShipName(id, ships);
+      attackShip(name, ships, setShips);
     }
-    )
-  }
+    setTurn(!turn);
+  };
 
   let tiles: ReactNode[] = [];
-  for (let i=0; i<11; i++) {
-    tiles.push(
-      <TextTile text={numbers[i]} orientation="horizontal"/>
-    );
-  }
 
-  for (let i=0; i < 10; i++) {
-    tiles.push(
-      <TextTile text={letters[i]} orientation="vertical"/>
-    );
-    for (let e=0; e<10; e++) {
-      let id = letters[i] + numbers[e+1];
+  // useEffect(() => {
+    for (let i=0; i<11; i++) {
       tiles.push(
-          <SeaTile id={id} onClick={attack} ship={ships[id]} attacked={attacks[id]}/>
-      )
+        <TextTile text={columns[i]} orientation="horizontal"/>
+      );
     }
-  }
+  
+    for (let i=0; i < 10; i++) {
+      tiles.push(
+        <TextTile text={letters[i]} orientation="vertical"/>
+      );
+      for (let e=0; e<10; e++) {
+        let id = letters[i] + columns[e+1];
+        tiles.push(
+            <SeaTile
+              id={id}
+              onClick={attack}
+              attacked={attacks[id]}
+              ship={findShip(id, ships)}
+              sunk={isShipSunk(id, ships)}
+            />
+        )
+      }
+    }
+  // },[numbers, letters, attacks, ships, tiles, attack])
 
 
   return (

@@ -6,14 +6,16 @@ import styled from "styled-components";
 interface SeaTileProps {
   id: string;
   onClick: (id: string) => void;
-  attacked?: boolean;
   ship?: boolean;
+  attacked?: boolean;
+  sunk?: boolean;
 }
 const SeaTile: React.FC<SeaTileProps> = ({
   id,
   onClick,
   attacked = false,
-  ship = false
+  ship = false,
+  sunk = false
 }) => {
   const Tile = styled.div`
   box-sizing: border-box;
@@ -27,6 +29,8 @@ const SeaTile: React.FC<SeaTileProps> = ({
     button {
       width: 100%;
       height: 100%;
+      padding: 0;
+      display: grid;
       ${attacked ? (
         `background-color: rgb(100,100,150);`
         ) : (
@@ -43,11 +47,29 @@ const SeaTile: React.FC<SeaTileProps> = ({
     `}
   `;
   
+  const Ship = styled.div`
+      width: 70%;
+      height: 70%;
+      border-radius: 10px;
+      justify-self: center;
+      align-self: center;
+      color: black;
+      font-size: 1.6rem;
+      ${attacked ? (
+        "background-color: rgb(170,70,70);"
+        ) : (
+          "background-color: rgb(20,20,20);"
+          )}
+      ${attacked && (
+        "border: 2px solid rgb(20, 20, 20);"
+      )}
+  `;
 
   return (
     <Tile>
       <button onClick={() => onClick(id)}>
-        {ship && <div>Ship</div>}
+      {/* <button onClick={() => attack(id)}> */}
+        {ship && <Ship>{sunk && "X"}</Ship>}
       </button>
     </Tile>
   )
