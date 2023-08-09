@@ -7,23 +7,29 @@ import TextTile from "./Tiles/TextTile";
 
 import { ShipType, Coordenates } from "../utils/types";
 import { setBoard, letters, numbers } from "../utils/setup";
-import { getShipName, attackShip, findShip, isShipSunk } from "../utils/utils";
+import { getShipName, findShip } from "../utils/utils";
+import { attackShip, isShipSunk } from "../utils/combat";
 
-const Board: React.FC = () => {
-  const Board = styled.div`
-    box-sizing: border-box;
-    display: grid;
-    grid-template-rows: repeat(11, 40px);
-    row-gap: 1px;
-    grid-template-columns: repeat(11, 40px);
-    column-gap: 1px;
-    background-color: rgb(190,190,190);
-    border-radius: 10px;
-    width: 470px;
-    height: 470px;
-    color: white;
-    padding: 5px;
-  `;
+const PlayerBoard = styled.div`
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: repeat(11, 40px);
+  row-gap: 1px;
+  grid-template-columns: repeat(11, 40px);
+  column-gap: 1px;
+  background: radial-gradient(ellipse at bottom right, rgba(100,100,100,0.6), rgba(200,220,220, 0.7));
+  border-radius: 10px;
+  width: 470px;
+  height: 470px;
+  color: white;
+  padding: 5px;
+`;
+
+interface BoardProps {
+  player?: boolean;
+};
+
+const Board: React.FC<BoardProps> = ({player = false}) => {
 
   const [turn, setTurn] = useState(true);
   const [attacks, setAttacks] = useState({} as Coordenates);
@@ -32,9 +38,8 @@ const Board: React.FC = () => {
   useEffect(() => {
     setShips(setBoard());
   }, []);
-
-  const columns = ["", ...numbers];
-  const attack = (id: string) => {
+  
+  const attack = useCallback((id: string) => {
     setAttacks({
       ...attacks,
       [id]: true
@@ -46,26 +51,29 @@ const Board: React.FC = () => {
       attackShip(name, ships, setShips);
     }
     setTurn(!turn);
-  };
+    console.log("PLAYER TURN!!", turn);
+  }, [attacks, ships, turn]);
 
   let tiles: ReactNode[] = [];
+  const columns = ["", ...numbers];
 
-  // useEffect(() => {
     for (let i=0; i<11; i++) {
       tiles.push(
-        <TextTile text={columns[i]} orientation="horizontal"/>
+        <TextTile key={columns[i]} text={columns[i]} orientation="horizontal"/>
       );
     }
-  
+
     for (let i=0; i < 10; i++) {
       tiles.push(
-        <TextTile text={letters[i]} orientation="vertical"/>
+        <TextTile key={letters[i]} text={letters[i]} orientation="vertical"/>
       );
       for (let e=0; e<10; e++) {
         let id = letters[i] + columns[e+1];
         tiles.push(
             <SeaTile
               id={id}
+              key={id}
+              player={player}
               onClick={attack}
               attacked={attacks[id]}
               ship={findShip(id, ships)}
@@ -74,13 +82,11 @@ const Board: React.FC = () => {
         )
       }
     }
-  // },[numbers, letters, attacks, ships, tiles, attack])
-
 
   return (
-    <Board>
+    <PlayerBoard>
       {...tiles}
-    </Board>
+    </PlayerBoard>
   )
 }
 
