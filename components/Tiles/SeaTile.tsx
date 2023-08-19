@@ -4,7 +4,7 @@ import React, { useContext } from "react";
 import styled from "styled-components";
 import { ShipType } from "../../utils/types";
 
-const Tile = styled.div<{ attacked?: boolean; }>`
+const Tile = styled.div<{ id: string; attacked?: boolean; }>`
   box-sizing: border-box;
   border-radius: 5px;
   width: 40px;
@@ -53,11 +53,11 @@ const SeaTile: React.FC<SeaTileProps> = ({
   onClick,
   player = false,
   disabled = false,
-  ship = false,
+  ship,
   sunk = false
 }) => {  
   return (
-    <Tile attacked={disabled}>
+    <Tile id={id} attacked={disabled}>
       <button disabled={disabled} onClick={() => onClick(id, ship)}>
         {ship && <Ship player={player} attacked={disabled}>{sunk && "X"}</Ship>}
       </button>

@@ -30,7 +30,6 @@ interface BoardProps {
 };
 
 const Board: React.FC<BoardProps> = ({player = false}) => {
-
   const [turn, setTurn] = useState(true);
   const [attacks, setAttacks] = useState({} as Coordenates);
   const [ships, setShips] = useState([] as ShipType[]);
